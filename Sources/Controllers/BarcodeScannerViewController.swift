@@ -10,6 +10,13 @@ public protocol BarcodeScannerCodeDelegate: class {
         didCaptureCode code: String,
         type: String
     )
+    
+    // MARK: - @ftamur
+    func imageSelected(
+        _ controller: BarcodeScannerViewController,
+        didSelectImage image: UIImage
+    )
+    
 }
 
 /// Delegate to report errors.
@@ -31,7 +38,7 @@ public protocol BarcodeScannerDismissalDelegate: class {
  - Unauthorized mode
  - Not found error message
  */
-open class BarcodeScannerViewController: UIViewController {
+open class BarcodeScannerViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     private static let footerHeight: CGFloat = 75
     
     // MARK: - Public properties
@@ -88,6 +95,9 @@ open class BarcodeScannerViewController: UIViewController {
         }
     }
     
+    // MARK: - @ftamur
+    private var imagePicker = UIImagePickerController()
+    
     // MARK: - View lifecycle
     
     open override func viewDidLoad() {
@@ -97,6 +107,11 @@ open class BarcodeScannerViewController: UIViewController {
         //    add(childViewController: messageViewController)
         //    messageView.translatesAutoresizingMaskIntoConstraints = false
         //    collapsedConstraints.activate()
+        // MARK: - @ftamur
+        // set up image picker
+        imagePicker.delegate = self
+        imagePicker.allowsEditing = false
+        imagePicker.sourceType = .photoLibrary
         
         cameraViewController.metadata = metadata
         cameraViewController.delegate = self
@@ -136,7 +151,7 @@ open class BarcodeScannerViewController: UIViewController {
     
     private func changeStatus(from oldValue: Status, to newValue: Status) {
         guard newValue.state != .notFound else {
-//            messageViewController.status = newValue
+            //            messageViewController.status = newValue
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2.0) {
                 self.status = Status(state: .scanning)
             }
@@ -237,44 +252,44 @@ private extension BarcodeScannerViewController {
             cameraView.topAnchor.constraint(equalTo: view.topAnchor)
         )
         
-//        if navigationController != nil {
-//            cameraView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-//        } else {
-//            headerViewController.delegate = self
-//            add(childViewController: headerViewController)
-//
-//            let headerView = headerViewController.view!
-//
-//            NSLayoutConstraint.activate(
-//                headerView.topAnchor.constraint(equalTo: view.topAnchor),
-//                headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//                headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//                headerView.bottomAnchor.constraint(equalTo: headerViewController.navigationBar.bottomAnchor),
-//                cameraView.topAnchor.constraint(equalTo: headerView.bottomAnchor)
-//            )
-//        }
+        //        if navigationController != nil {
+        //            cameraView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        //        } else {
+        //            headerViewController.delegate = self
+        //            add(childViewController: headerViewController)
+        //
+        //            let headerView = headerViewController.view!
+        //
+        //            NSLayoutConstraint.activate(
+        //                headerView.topAnchor.constraint(equalTo: view.topAnchor),
+        //                headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        //                headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        //                headerView.bottomAnchor.constraint(equalTo: headerViewController.navigationBar.bottomAnchor),
+        //                cameraView.topAnchor.constraint(equalTo: headerView.bottomAnchor)
+        //            )
+        //        }
         
     }
     
-//    private func makeExpandedConstraints() -> [NSLayoutConstraint] {
-//        return [
-//            messageView.topAnchor.constraint(equalTo: view.topAnchor),
-//            messageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            messageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            messageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-//        ]
-//    }
-//
-//    private func makeCollapsedConstraints() -> [NSLayoutConstraint] {
-//        return [
-//            messageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-//            messageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            messageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            messageView.heightAnchor.constraint(
-//                equalToConstant: BarcodeScannerViewController.footerHeight
-//            )
-//        ]
-//    }
+    //    private func makeExpandedConstraints() -> [NSLayoutConstraint] {
+    //        return [
+    //            messageView.topAnchor.constraint(equalTo: view.topAnchor),
+    //            messageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+    //            messageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+    //            messageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+    //        ]
+    //    }
+    //
+    //    private func makeCollapsedConstraints() -> [NSLayoutConstraint] {
+    //        return [
+    //            messageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    //            messageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+    //            messageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+    //            messageView.heightAnchor.constraint(
+    //                equalToConstant: BarcodeScannerViewController.footerHeight
+    //            )
+    //        ]
+    //    }
     
 }
 
@@ -289,6 +304,14 @@ extension BarcodeScannerViewController: HeaderViewControllerDelegate {
 // MARK: - CameraViewControllerDelegate
 
 extension BarcodeScannerViewController: CameraViewControllerDelegate {
+    
+    // MARK: - @ftamur
+    
+    // if picker button clicked present image picker
+    func cameraViewControllerDidTapPickerButton(_ controller: CameraViewController) {
+        present(imagePicker, animated: true, completion: nil)
+    }
+    
     func cameraViewControllerDidSetupCaptureSession(_ controller: CameraViewController) {
         status = Status(state: .scanning)
     }
@@ -307,6 +330,24 @@ extension BarcodeScannerViewController: CameraViewControllerDelegate {
                 UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
             }
         }
+    }
+    
+    // MARK: - @ftamur
+    
+    // if user chose image from photo library
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        if let image = info[.originalImage] as? UIImage {
+            picker.dismiss(animated: true, completion: nil)
+            codeDelegate?.imageSelected(self, didSelectImage: image)
+        }else {
+            picker.dismiss(animated: true, completion: nil)
+        }
+    
+    }
+    
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
     
     func cameraViewController(_ controller: CameraViewController,
