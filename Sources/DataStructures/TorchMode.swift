@@ -20,12 +20,12 @@ public enum TorchMode {
   var image: UIImage {
     switch self {
     case .on:
-      let origImage = UIImage(named: "flash-on")
+      let origImage = UIImage(named: "ios-flash-on")
       let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
       
       return tintedImage!
     case .off:
-      let origImage = UIImage(named: "flash-off")
+      let origImage = UIImage(named: "ios-flash-off")
       let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
       
       return tintedImage!

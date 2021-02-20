@@ -379,11 +379,9 @@ private extension CameraViewController {
         // MARK: - @ftamur
         // size for picker button
         
-        let flashImageWidth: CGFloat = 28
+        let flashImageSize: CGFloat = 42
         let pickerImageWidth: CGFloat = 42
-        
-        let flashImageRatio = (flashButton.imageView?.image?.size.height)! / (flashButton.imageView?.image?.size.width)!
-        
+    
         let pickerImageRatio = (pickerButton.imageView?.image?.size.height)! / (pickerButton.imageView?.image?.size.width)!
         
         NSLayoutConstraint.activate(
@@ -392,8 +390,8 @@ private extension CameraViewController {
             pickerButton.widthAnchor.constraint(equalToConstant: pickerImageWidth),
             pickerButton.heightAnchor.constraint(equalToConstant: pickerImageWidth * pickerImageRatio),
             
-            flashButton.widthAnchor.constraint(equalToConstant: flashImageWidth),
-            flashButton.heightAnchor.constraint(equalToConstant: flashImageWidth * flashImageRatio),
+            flashButton.widthAnchor.constraint(equalToConstant: flashImageSize),
+            flashButton.heightAnchor.constraint(equalToConstant: flashImageSize),
             
             settingsButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             settingsButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
