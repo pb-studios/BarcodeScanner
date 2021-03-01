@@ -379,8 +379,8 @@ private extension CameraViewController {
         // MARK: - @ftamur
         // size for picker button
         
-        let flashImageSize: CGFloat = 42
-        let pickerImageWidth: CGFloat = 42
+        let flashImageSize: CGFloat = 32
+        let pickerImageWidth: CGFloat = 36
     
         let pickerImageRatio = (pickerButton.imageView?.image?.size.height)! / (pickerButton.imageView?.image?.size.width)!
         
