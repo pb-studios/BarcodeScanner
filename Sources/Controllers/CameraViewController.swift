@@ -53,6 +53,18 @@ public final class CameraViewController: UIViewController {
     // Constraints for the focus view when it gets bigger in size.
     private var animatedFocusViewConstraints = [NSLayoutConstraint]()
     
+    // @ftamur
+    private let askForCameraPermission: UILabel = {
+        let label = UILabel()
+        label.text = localizedString("ASK_FOR_PERMISSION_TEXT")
+        label.textAlignment = .center
+        label.textColor = .lightGray
+        label.font = .systemFont(ofSize: 17)
+        label.isHidden = false
+        label.numberOfLines = 3
+        return label
+    }()
+    
     // MARK: - Video
     
     /// Video preview layer.
@@ -98,11 +110,42 @@ public final class CameraViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    // @ftamur
+    
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        // Trait collection has already changed
+        
+        if !self.settingsButton.isHidden {
+            if previousTraitCollection!.userInterfaceStyle == .light {
+                pickerButton.tintColor = .white
+            } else {
+                pickerButton.tintColor = .black
+            }
+        }
+    
+    }
+
+    public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        // Trait collection will change. Use this one so you know what the state is changing to.
+        
+        if !self.settingsButton.isHidden {
+        
+            if newCollection.userInterfaceStyle == .light {
+                pickerButton.tintColor = .black
+            } else {
+                pickerButton.tintColor = .white
+            }
+        
+        }
+    }
+    
     // MARK: - View lifecycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
+        
+        view.backgroundColor = UIColor(named: "modalViewBackground")
+        
         videoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
         videoPreviewLayer?.videoGravity = .resizeAspectFill
         
@@ -115,10 +158,15 @@ public final class CameraViewController: UIViewController {
         let origImage = UIImage(named: "picker")
         let tintedImage = origImage?.withRenderingMode(.alwaysTemplate)
         pickerButton.setImage(tintedImage, for: .normal)
-        pickerButton.tintColor = .white
+
+        if traitCollection.userInterfaceStyle == .light {
+            pickerButton.tintColor = .black
+        } else {
+            pickerButton.tintColor = .white
+        }
         
         view.layer.addSublayer(videoPreviewLayer)
-        view.addSubviews(pickerButton, settingsButton, flashButton, focusView, cameraButton)
+        view.addSubviews(askForCameraPermission, pickerButton, settingsButton, flashButton, focusView, cameraButton)
         
         torchMode = .off
         focusView.isHidden = true
@@ -243,6 +291,13 @@ public final class CameraViewController: UIViewController {
             
             DispatchQueue.main.async { [weak self] in
                 self?.settingsButton.isHidden = error == nil
+                
+                if error == nil {
+                    self?.pickerButton.tintColor = .white
+                }
+                
+                self?.askForCameraPermission.isHidden = error == nil
+                
             }
             
             if error == nil {
@@ -393,9 +448,13 @@ private extension CameraViewController {
             flashButton.widthAnchor.constraint(equalToConstant: flashImageSize),
             flashButton.heightAnchor.constraint(equalToConstant: flashImageSize),
             
+            askForCameraPermission.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            askForCameraPermission.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30),
+            askForCameraPermission.widthAnchor.constraint(equalTo: view.widthAnchor),
+            
             settingsButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            settingsButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            settingsButton.widthAnchor.constraint(equalToConstant: 150),
+            settingsButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
+            settingsButton.widthAnchor.constraint(equalToConstant: 230),
             settingsButton.heightAnchor.constraint(equalToConstant: 50),
             
             cameraButton.widthAnchor.constraint(equalToConstant: 48),
@@ -473,9 +532,11 @@ private extension CameraViewController {
         let button = UIButton(type: .system)
         let title = NSAttributedString(
             string: localizedString("BUTTON_SETTINGS"),
-            attributes: [.font: UIFont.boldSystemFont(ofSize: 17), .foregroundColor: UIColor.white]
+            attributes: [.font: UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold), .foregroundColor: UIColor.white]
         )
         button.setAttributedTitle(title, for: UIControl.State())
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 10
         button.sizeToFit()
         return button
     }
