@@ -56,12 +56,12 @@ public final class CameraViewController: UIViewController {
     // @ftamur
     private let askForCameraPermission: UILabel = {
         let label = UILabel()
-        label.text = localizedString("ASK_FOR_PERMISSION_TEXT")
         label.textAlignment = .center
         label.textColor = .lightGray
-        label.font = .systemFont(ofSize: 17)
-        label.isHidden = false
         label.numberOfLines = 3
+        label.font = UIFont.systemFont(ofSize: 22, weight: .light)
+        label.isHidden = true
+        label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
@@ -169,7 +169,6 @@ public final class CameraViewController: UIViewController {
         view.addSubviews(askForCameraPermission, pickerButton, settingsButton, flashButton, focusView, cameraButton)
         
         torchMode = .off
-        focusView.isHidden = true
         setupCamera()
         setupConstraints()
         setupActions()
@@ -449,13 +448,13 @@ private extension CameraViewController {
             flashButton.heightAnchor.constraint(equalToConstant: flashImageSize),
             
             askForCameraPermission.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            askForCameraPermission.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30),
-            askForCameraPermission.widthAnchor.constraint(equalTo: view.widthAnchor),
+            askForCameraPermission.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -60),
+            askForCameraPermission.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -100),
             
             settingsButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             settingsButton.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 30),
-            settingsButton.widthAnchor.constraint(equalToConstant: 230),
-            settingsButton.heightAnchor.constraint(equalToConstant: 50),
+            settingsButton.widthAnchor.constraint(equalToConstant: 180),
+            settingsButton.heightAnchor.constraint(equalToConstant: 40),
             
             cameraButton.widthAnchor.constraint(equalToConstant: 48),
             cameraButton.heightAnchor.constraint(equalToConstant: 48),
@@ -525,6 +524,7 @@ private extension CameraViewController {
         view.layer.shadowOpacity = 0.9
         view.layer.shadowOffset = CGSize.zero
         view.layer.masksToBounds = false
+        view.isHidden = true
         return view
     }
     
@@ -532,12 +532,14 @@ private extension CameraViewController {
         let button = UIButton(type: .system)
         let title = NSAttributedString(
             string: localizedString("BUTTON_SETTINGS"),
-            attributes: [.font: UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.semibold), .foregroundColor: UIColor.white]
+            attributes: [.font: UIFont.systemFont(ofSize: 20, weight: UIFont.Weight.light), .foregroundColor: UIColor.lightGray]
         )
         button.setAttributedTitle(title, for: UIControl.State())
-        button.backgroundColor = .systemBlue
+        button.layer.borderWidth = 2
+        button.layer.borderColor = UIColor.lightGray.cgColor
         button.layer.cornerRadius = 10
         button.sizeToFit()
+        button.isHidden = true
         return button
     }
     
