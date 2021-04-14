@@ -54,7 +54,7 @@ public final class CameraViewController: UIViewController {
     private var animatedFocusViewConstraints = [NSLayoutConstraint]()
     
     // @ftamur
-    private let askForCameraPermission: UILabel = {
+    public let askForCameraPermission: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.textColor = .lightGray
