@@ -245,10 +245,12 @@ private extension BarcodeScannerViewController {
         constraintsActivated = true
         let cameraView = cameraViewController.view!
         
+        let tabbarHeight = self.tabBarController?.tabBar.frame.size.height ?? 49
+        
         NSLayoutConstraint.activate(
             cameraView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             cameraView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            cameraView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            cameraView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -tabbarHeight),
             cameraView.topAnchor.constraint(equalTo: view.topAnchor)
         )
         
